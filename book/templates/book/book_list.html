@@ -1,0 +1,190 @@
+<div class="main-container">
+    {% extends 'book/base.html' %}
+    {% load static %}
+    {% block title %}
+        <title>Библиотека</title>
+    {% endblock %}
+    {% block content %}
+        
+        <div class="d-flex">
+            <h1 class="head-text">Все книги</h1>
+              <button id="filter-toggle-btn" class="btn btn-light ml-auto">
+            <i class="bi bi-sliders icon-sliders"></i>
+        </button>
+        </div>
+        
+        <div class="d-flex">
+            <div id="sidebar" class="sidebar">
+
+                <form method="GET" class="filter-form mb-4">
+                    <div class="row">
+                    
+                    <div class="d-flex">
+                        <h3 class="head-text">Фильтры</h3>
+                          <button id="filter-close-btn" class="bi bi-x-lg icon-x" type="button">
+                            </button>
+                    </div>
+                    <div class="col-12 mb-3">
+                    <div style="padding-bottom: 10px; padding-top: 10px;"><a href="{% url 'book_catalog' page_number=1 %}" class="btn btn-success">Сбросить</a></div>
+        <label for="author-search">Авторы</label>
+        <input type="text" id="author-search" class="form-control form-author" placeholder="Введите автора">
+    <div class="checkbox-group mt-2" id="selected-author-checkboxes">
+    </div>
+    <hr class="hr-filter">
+<div class="checkbox-group mt-2" id="author-checkboxes">
+    {% for author in authors %}
+        <div class="form-check author-checkbox" data-index="{{ forloop.counter }}">
+            <input class="form-check-input" type="checkbox" name="authors" id="author-{{ author.id }}"
+                   value="{{ author.id }}" {% if author.id|stringformat:"s" in selected_authors %}checked{% endif %}>
+            <label class="form-check-label" for="author-{{ author.id }}">{{ author.name }}</label>
+        </div>
+    {% endfor %}
+</div>
+</div>
+
+<div class="col-12 mb-3">
+    <label for="genre-search">Жанры</label>
+    <input type="text" id="genre-search" class="form-control form-genre" placeholder="Введите жанр">
+    <div class="checkbox-group mt-2" id="selected-genre-checkboxes">
+    </div>
+    <hr>
+    <div class="checkbox-group mt-2" id="genre-checkboxes">
+        {% for genre in genres %}
+            <div class="form-check genre-checkbox" data-index="{{ forloop.counter }}">
+                <input class="form-check-input" type="checkbox" name="genres" id="genre-{{ genre.id }}"
+                       value="{{ genre.id }}" {% if genre.id|stringformat:"s" in selected_genres %}checked{% endif %}>
+                <label class="form-check-label" for="genre-{{ genre.id }}">{{ genre.name }}</label>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+                    
+    <div class="col-12 mb-3">
+        <label for="publisher-search">Издательства</label>
+        <input type="text" id="publisher-search" class="form-control form-publisher" placeholder="Введите издательство">
+        <div class="checkbox-group mt-2" id="selected-publisher-checkboxes">
+            
+        </div>
+            <hr>
+            <div class="checkbox-group mt-2" id="publisher-checkboxes">
+                {% for publisher in publishers %}
+                    <div class="form-check publisher-checkbox" data-index="{{ forloop.counter }}">
+                        <input class="form-check-input" type="checkbox" name="publisher" id="publisher-{{ publisher.id }}"
+                               value="{{ publisher.id }}" {% if publisher.id|stringformat:"s" in selected_publishers %}checked{% endif %}>
+                        <label class="form-check-label" for="publisher-{{ publisher.id }}">{{ publisher.name }}</label>
+                            </div>
+                {% endfor %}
+                    </div>
+                </div>
+            </div>
+                <button type="submit" class="btn btn-success mt-3">Применить фильтры</button>
+        </form>
+    </div>
+
+            <div class="book-container flex-grow-1">
+            {% if books %}
+                {% for book in books %}
+                    <div class="main-content mt-3 d-flex">
+                        <div class="book-image">
+                            {% if book.image %}
+                                <a href="{% url 'book' book.id %}">
+                                
+                                    <img class="rounded" src="{{ book.image.url }}" alt="{{ book.title }}">
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="book-details">
+                            <a href="{% url 'book' book.id %}"><h6 class="book-title">{{ book.title }}</h6></a>
+                            <a href="{% url 'book_catalog' page_number=1  %}?authors={{ book.author.id }}" class="book-author">{{ book.author }}</a>
+                            {% csrf_token %}
+                            <a href="#" class="bookmark-icon" data-book-id="{{ book.id }}" onclick="toggleBookmark(this)">
+                                {% if book.id in user_library %}
+                                    <i class="bi bi-bookmark-fill" style="color: #007000"></i>
+                                {% else %}
+                                    <i class="bi bi-bookmark" style="color: #007000"></i>
+                                {% endif %}
+                            </a>
+                            <div class="d-flex">
+                                <img src="{% static 'images/star_full.svg' %}" alt="star" class="star_info" style="width: 1.1rem; margin-top: 5px; margin-bottom: 5px">
+                                <p class="star_text" style="margin-bottom: 5px; margin-top: 5px; margin-left: 5px">
+                                    {{ book.average_rating|default:"Нет оценок" }}
+                                </p>
+                            </div>
+                            <p class="book-description">{{ book.get_short_desc }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+
+                 <div class="empty-library text-center my-5">
+                    <p class="text-muted" style="margin-bottom: 335px; margin-top: 300px" >
+                        Ничего не найдено :(
+{#                        <a href="{% url 'book_catalog' page_number=1 %}" class="text-primary">Давайте её заполним!</a>#}
+                    </p>
+                </div>
+
+            {% endif %}
+            </div>
+        </div>
+
+    <script src="{% static 'js/book-filtered.js' %}"></script>
+
+    <script>
+        function getCSRFToken() {
+    const cookies = document.cookie.split('; ');
+    for (const cookie of cookies) {
+        const [name, value] = cookie.split('=');
+        if (name === 'csrftoken') {
+            return value;
+        }
+    }
+    return null;
+}
+
+function toggleBookmark(element) {
+    const bookId = element.getAttribute('data-book-id'); 
+    //const icon = element.querySelector('i');
+    const url = `/library/add/${bookId}`;  
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(), 
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+        .then(() => {
+                    vanillaToast.show('Книга добавлена в библиотеку!', {className: 'green'})
+            })
+    .catch(() =>  {vanillaToast.show('Произошла ошибка!', {className: 'error'})});
+}
+    </script>
+        
+    {% endblock %}
+</div>
+
+{% block footer %}
+{% if books %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination d-flex justify-content-center">
+
+        <li class="page-item {% if not books.has_previous %} disabled {% endif %}">
+            <a class="page-link" href="{% if books.has_previous %} {% url 'book_catalog' books.previous_page_number %} {% else %} # {% endif %}">Предыдущая</a>
+        </li>
+        {% for page in page_range %}
+            <li class="page-item {% if page == books.number %} disabled {% endif %}">
+                <a class="page-link" href="{% url 'book_catalog' page %}">{{ page }}</a>
+            </li>
+        {% endfor %}
+        <li class="page-item {% if not books.has_next %} disabled {% endif %}">
+            <a class="page-link" href="{% if books.has_next %} {% url 'book_catalog' books.next_page_number %} {% else %} # {% endif %}">Следующая</a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+
+<footer class="bg-white text-center py-4">
+    <p>© 2024 Рекомендательный сервис для книг</p>
+</footer>
+{% endblock %}

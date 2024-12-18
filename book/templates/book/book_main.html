@@ -1,0 +1,106 @@
+{% extends 'book/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+    <div class="header text-center mb-4">
+        <h1 class="display-4 text-success">Добро пожаловать в нашу библиотеку!</h1>
+        <p class="lead text-secondary">Откройте для себя мир знаний и увлекательных историй</p>
+    </div>
+
+    <div class="popular-books-section mb-5">
+        <h2 class="text-secondary">Популярные книги</h2>
+        <div class="row mt-4">
+            {% for book in popular_books %}
+            <div class="col-6 col-sm-4 col-md-3 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if book.image %}
+                    <a href="{% url 'book' book.id %}">
+                        <img class="card-img-top rounded-top" src="{{ book.image.url }}" alt="{{ book.title }}" style="height: 200px; object-fit: cover;">
+                    </a>
+                    {% else %}
+                    <img class="card-img-top rounded-top" src="{% static 'default_book.jpg' %}" alt="Нет изображения" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text text-muted mb-2">{{ book.author }}</p>
+                        <a href="{% url 'book' book.id %}" class="btn btn-success mt-auto">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="new-books-section mb-5">
+        <h2 class="text-secondary">Новые поступления</h2>
+        <div class="list-group mt-4">
+            {% for book in new_books %}
+            <a href="{% url 'book' book.id %}" class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                    {% if book.image %}
+                    <img src="{{ book.image.url }}" alt="{{ book.title }}" class="rounded me-3" style="width: 60px; height: 80px; object-fit: cover;">
+                    {% else %}
+                    <img src="{% static 'default_book.jpg' %}" alt="Нет изображения" class="rounded me-3" style="width: 60px; height: 80px; object-fit: cover;">
+                    {% endif %}
+                    <div class="ml-2">
+                        <h5 class="mb-0">{{ book.title }}</h5>
+                        <p class="mb-0 text-muted">{{ book.author }}</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="genre-books-section mb-5">
+        <h2 class="text-secondary">Русская классика</h2>
+        <div class="row mt-4">
+            {% for book in russian_classics %}
+            <div class="col-6 col-sm-4 col-md-3 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if book.image %}
+                    <a href="{% url 'book' book.id %}">
+                        <img class="card-img-top rounded-top" src="{{ book.image.url }}" alt="{{ book.title }}" style="height: 200px; object-fit: cover;">
+                    </a>
+                    {% else %}
+                    <img class="card-img-top rounded-top" src="{% static 'default_book.jpg' %}" alt="Нет изображения" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text text-muted mb-2">{{ book.author }}</p>
+                        <a href="{% url 'book' book.id %}" class="btn btn-success mt-auto">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="new-books-section mb-5">
+        <h2 class="text-secondary">Нравится пользователям похожим на вас!</h2>
+        <div class="list-group mt-4">
+            {% for book in recommended_books %}
+            <a href="{% url 'book' book.id %}" class="list-group-item list-group-item-action">
+                <div class="d-flex align-items-center">
+                    {% if book.image %}
+                    <img src="{{ book.image.url }}" alt="{{ book.title }}" class="rounded me-3" style="width: 60px; height: 80px; object-fit: cover;">
+                    {% else %}
+                    <img src="{% static 'default_book.jpg' %}" alt="Нет изображения" class="rounded me-3" style="width: 60px; height: 80px; object-fit: cover;">
+                    {% endif %}
+                    <div class="ml-2">
+                        <h5 class="mb-0">{{ book.title }}</h5>
+                        <p class="mb-0 text-muted">{{ book.author }}</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="text-center mt-5">
+        <p class="text-secondary">Ещё больше книг вы можете увидеть в нашей библиотеке:</p>
+        <a href="{% url 'book_catalog' page_number=1 %}" class="btn btn-outline-success">Перейти в библиотеку</a>
+    </div>
+</div>
+{% endblock %}

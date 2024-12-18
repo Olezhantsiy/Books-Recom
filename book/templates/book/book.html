@@ -1,0 +1,165 @@
+{% extends 'book/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row no-gutters">
+                <!-- Изображение книги -->
+                <div class="col-md-4 text-center">
+                    <img src="{{ book.image.url }}" alt="{{ book.title }}" class="img-fluid shadow rounded" style="max-height: 360px; margin-top: 40px;">
+                </div>
+                <!-- Информация о книге -->
+                <div class="col-md-8 p-3">
+                    <h1 class="h1 font-weight-bold">{{ book.title }}</h1>
+                    <p class="h6 mb-4"><a href="{% url 'book_catalog' page_number=1 %}?authors={{ book.author.id }}" class="book-author">{{ book.author }}</a></p>
+                
+                 <!--    STARS-->
+                    <div class="container d-flex" id="scorediv" style="gap: .3rem">
+                        <!-- STARS HERE -->
+                        <div>
+                            <h6>{% if rating_count == 1 %}1 Оценка{% elif rating_count <= 0 %} Нет оценок {% else %} {{ rating_count }} Оценки {% endif %}</h6>
+                        </div>
+                            <input type="hidden" value="{% if average_rating == None %}0{% else %}{{ average_rating }}{% endif %}" id="score">
+                       <!-- END STARS-->
+                    </div>
+                
+                    <h4 class="mt-4">Описание и характеристики</h4>
+                    <p class="mt-3">{{ book.description }}</p>
+
+                    <hr class="my-4 mx-2">
+                <div class="d-flex book-content">
+                    <div>
+                        <ul class="list-unstyled mt-3">
+                            <li class="mt-2"><strong>Дата написания:</strong> {{ book.publication_date }}</li>
+                            {% if not book.isbn == None %}<li class="mt-2"><strong>ISBN:</strong> {{ book.isbn }}</li>{% endif %}
+                            <li class="mt-2"><strong>Количество страниц:</strong> {{ book.page_count }}</li>
+                            <li class="mt-2"><strong>Издатель:</strong> {{ book.publisher }}</li>
+                        </ul>
+    
+                        {% if book.genres.all %}
+                            <h6 class="mt-4">Жанры:</h6>
+                            <p>
+                                {% for genre in book.genres.all %}
+                                    <span class="badge badge-success">{{ genre.name }}</span>
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="rating-stars"> 
+                           {% if user.is_authenticated %}
+                        <div class="mt-4">
+                            <h4>Оцените книгу:</h4>
+                            <div id="rating" class="d-flex gap-2">
+                                {% for i in "12345"|make_list %}
+                                <i class="fa fa-star star" data-value="{{ i }}" style="font-size: 2rem; cursor: pointer; color: #ccc;"></i>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" id="rating-value" value="0">
+                        </div>
+                    {% endif %}
+                    </div>
+                 </div>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3 class="mb-4">Похожие книги</h3>
+            <div id="similarBooksCarousel" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                {% for book in recommendations_books %}
+                    {% if forloop.counter0|divisibleby:5 %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <div class="d-flex justify-content-around">
+                    {% endif %}
+
+                    <div class="text-center mx-2" style="width: 150px;">
+                    
+                        <img src="{{ book.image.url }}" alt="{{ book.title }}" class="img-fluid rounded mb-2" style="max-height: 250px;">
+                        <a href="{% url 'book' book.id  %}"><h6 class="font-weight-bold text-truncate book-title" style="max-width: 150px; font-size: 0.9rem;">{{ book.title }}</h6></a>
+                        <p class="text-muted" style="font-size: 0.8rem;">
+                            <a href="{% url 'book_catalog' page_number=1 %}?authors={{ book.author.id }}" class="book-author">{{ book.author.name }}</a>
+                        </p>
+                    </div>
+
+                    {% if forloop.counter|divisibleby:5 or forloop.last %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+                <a class="carousel-control-prev" href="#similarBooksCarousel" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#similarBooksCarousel" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const stars = document.querySelectorAll(".star");
+        const ratingValue = document.getElementById("rating-value");
+        
+        stars.forEach(star => {
+            star.addEventListener("mouseover", () => {
+                resetStars();
+                highlightStars(star.dataset.value);
+            });
+
+            star.addEventListener("mouseleave", resetStars);
+
+            star.addEventListener("click", () => {
+                ratingValue.value = star.dataset.value;
+                submitRating(star.dataset.value);
+            });
+        });
+
+        function highlightStars(value) {
+            for (let i = 0; i < value; i++) {
+                stars[i].style.color = "gold";
+            }
+        }
+
+        function resetStars() {
+            stars.forEach(star => {
+                star.style.color = "#ccc";
+            });
+        }
+
+        function submitRating(value) {
+            fetch("/rate-book/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    book_id: {{ book.id }},
+                    rating: value
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    vanillaToast.show('Спасибо за оценку!', {className: 'green'})
+                } else {
+                    vanillaToast.show('Спасибо за оценку!', {className: 'error'})
+                }
+            })
+            .catch(() => {
+                vanillaToast.show('Спасибо за оценку!', {className: 'error'})
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'book/base.html' %}
+{% block content %}
+    <h1 class="head-text mb-4">Настройки</h1> 
+    <div class="user-details">
+  <div class="row">
+    <div class="col-sm">
+        <form action="{% url 'login' %}" method="post">
+            <div class="mb-4">
+      <p>Имя</p>
+        <input type="text" class="form-control" name="firstname" value="{{ user.first_name }}">
+            </div>
+            <div class="mb-4">
+        <p>Фамилиля</p>
+        <input type="text" class="form-control" name="lastame" value="{{ user.last_name }}">
+            </div>
+            <div>
+            <button class="btn btn-success" type="submit"><span></span>Сохранить</button>
+            </div>
+        </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

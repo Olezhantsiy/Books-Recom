@@ -1,0 +1,323 @@
+body {
+    background-color: #f1f1f1;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+*{
+    scrollbar-width: thin;
+    scrollbar-color: #007000 transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 5px; /* Ширина скроллбара */
+  }
+
+  /* Стили для полосы прокрутки */
+*::-webkit-scrollbar-thumb {
+    background-color: #007000; /* Цвет скроллбара */
+    border-radius: 5px; /* Радиус закругления */
+  }
+
+  /* Стили для полосы прокрутки при наведении */
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #007000; /* Цвет скроллбара при наведении */
+  }
+
+
+.navbar {
+    margin-bottom: 30px;
+}
+
+.nav-link, .dropdown-item{
+    color: #007000 !important;
+    font-weight: 650;
+}
+
+.nav-link:hover, .dropdown-item:hover, .dropdown-item:active {
+    filter: brightness(1.5); /* Увеличивает яркость (осветляет) */
+    transition: filter 0.4s ease;
+}
+
+.dropdown-item-text{
+}
+
+.form-control:focus {
+    border-color: #28a745 !important; /* Зеленая граница */
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.5) !important; /* Полупрозрачная зелёная тень */
+    outline: none !important; /* Убираем стандартную обводку */
+    border-width: 2px !important; /* Увеличиваем толщину обводки */
+}
+
+ /*Переименовать*/
+.head-text{
+    font-weight:650
+}
+
+footer {
+    margin-top: 30px;
+}
+
+/* Мейн контент */
+.main-content {
+    position: relative;
+    background-color: #ffffff;
+    max-height: 220px;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.book-image img {
+    max-width: 110px;
+    border-radius: 8px;
+}
+
+.book-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.user-details {
+    background-color: #ffffff;
+    /*max-height: 220px;*/
+    padding: 25px;
+    border-radius: 8px;
+    /*box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);*/
+    /*width: 100%;*/
+}
+
+
+.book-title,.book-title:link, .book-title:visited, .book-title:hover, .book-title:active {
+    color: #000000;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover{
+    text-decoration: none;
+}
+
+ /* unvisited link */
+.book-author:link{
+  color: #009a00;
+  text-decoration: none;
+}
+
+/* visited link */
+.book-author:visited{
+  color: green;
+  text-decoration: none;
+}
+
+/* mouse over link */
+.book-author:hover{
+  text-decoration: none;
+  color: #007000;
+}
+
+/* selected link */
+.book-author:active{
+  color: #007000;
+  text-decoration: none;
+}
+
+.page-link:link {
+  color: #007000;
+}
+
+.page-link:visited{
+  color: green;
+}
+
+.page-link:hover{
+  transition: color 0.5s ease;
+}
+
+.carousel-control-prev, .carousel-control-next {
+    width: 30px; /* Уменьшаем ширину */
+    height: 30px; /* Уменьшаем высоту */
+    border-radius: 50%; /* Делаем круглыми */
+    padding: 5px; /* Уменьшаем отступы для стрелок */
+    background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+}
+
+.carousel-control-prev-icon, .carousel-control-next-icon {
+    width: 16px; /* Уменьшаем размер иконок стрелок */
+    height: 16px;
+    background-size: 100%; /* Чтобы иконки не растягивались */
+}
+
+
+.bi-bookmark, .bi-bookmark-fill, .user-library-dropdown {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    color: #007000;
+    text-decoration: none;
+}
+
+.book-description {
+    white-space: pre-wrap; /* Позволяет переносить строки и учитывать пробелы */
+    word-wrap: break-word; /* Переносит длинные слова на новую строку */
+    overflow-wrap: break-word; /* Совместимость с другими браузерами */
+    font-size: 0.9rem;
+    }
+
+.user-library-dropdown .dropdown-menu {
+   max-width: 90vw; /* Ограничить ширину выпадающего списка */
+}
+
+.rating-stars{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hidden-checkboxes {
+    display: none;
+}
+
+
+.filter-container {
+    max-height: 900px; /* Задайте подходящую высоту */
+    overflow-y: auto;  /* Включает вертикальную прокрутку */
+    scrollbar-width: thin; /* Для стилизации на Firefox */
+}
+
+#author-search, #genre-search, #publisher-search, .hr-filter {
+    width: 280px;
+}
+
+
+@media screen and (max-width: 1640px) {
+    .dropdown-menu {
+        margin-right: 200px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .book-title, .book-author {
+        font-size: 0.8rem;
+    }
+
+    .main-content {
+        max-width: 100%;
+        padding: 10px;
+    }
+}
+
+.sidebar {
+        position: fixed;
+        top: 0;
+        left: -350px;
+        width: 350px;
+        height: 100%;
+        background-color: #f8f9fa;
+        transition: left 0.3s ease;
+        padding: 20px;
+        z-index: 1050;
+        overflow-y: auto;
+    }
+
+.sidebar.open {
+    left: 0;
+}
+
+#filter-close-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .icon-x {
+        font-size: 1.2rem;
+        position: absolute;
+        right: 20px;
+        top: 30px;
+    }
+
+  #vanilla-toast.green {
+    background-color: #007000;
+  }
+
+#vanilla-toast.error {
+    background-color: #b80000;
+  }
+
+@media screen and (max-width: 768px) {
+
+    .star_info{
+        width: 0.8rem;
+    }
+     .star_text {
+
+        font-size: 0.8rem;
+    }
+
+    .sidebar {
+        left: -768px;
+        width: 100%;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .icon-sliders {
+        font-size: 1.6rem;
+    }
+
+    #filter-close-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #filter-toggle-btn {
+        margin-left: auto; /* Сдвигает кнопку вправо */
+    }
+
+    .book-description {
+        font-size: 0;
+        visibility: hidden;
+    }
+
+    .book-image img {
+        max-width: 90px;
+    }
+
+    .bi-bookmark, .bi-bookmark-fill {
+        font-size: 1.2rem;
+    }
+
+    .main-content {
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .dropdown-menu {
+        margin-right: 200px;
+    }
+
+    .book-content {
+        flex-direction: column;
+    }
+
+    .rating-stars {
+        margin-left: 0;
+    }
+
+}

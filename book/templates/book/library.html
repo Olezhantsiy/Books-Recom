@@ -1,0 +1,149 @@
+<div class="main-container">
+    {% extends 'book/base.html' %}
+    {% block title %}
+        <title>Моя библиотека</title>
+    {% endblock %}
+    {% block content %}
+        <h1 class="head-text">Мои книги</h1>
+        <div class="book-container flex-grow-1">
+            {% if user_books %}
+                {% for user_book in user_books %}
+                    <div class="main-content mt-3 d-flex">
+                        <div class="book-image">
+                            {% if user_book.book.image %}
+                                <a href="#">
+                                    <img class="rounded" src="{{ user_book.book.image.url }}" alt="{{ user_book.book.title }}">
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="book-details">
+                            <a href="{% url 'book' user_book.book.id %}">
+                                <h6 class="book-title">{{ user_book.book.title }}</h6>
+                            </a>
+                            <p class="book-author">{{ user_book.book.author }}</p>
+                            <p class="book-status">
+                                Статус:
+                                {% if user_book.status == 'read' %}
+                                    Прочитано
+                                {% elif user_book.status == 'planned' %}
+                                    Хочу прочитать
+                                {% endif %}
+                            </p>
+                            <p class="book-description">{{ user_book.book.description|truncatewords:20 }}</p>
+
+                            <div class="dropdown user-library-dropdown">
+                                <i class="bi bi-three-dots" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;"></i>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ user_book.id }}">
+                                    <a class="dropdown-item" href="#" onclick="updateStatus('{{ user_book.id }}', 'planned')">Хочу прочитать</a>
+                                    <a class="dropdown-item" href="#" onclick="updateStatus('{{ user_book.id }}', 'read')">Прочитано</a>
+                                    <a class="dropdown-item text-danger" href="#" onclick="confirmDelete('{{ user_book.id }}')">Удалить из библиотеки</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-library text-center my-5">
+                    <p class="text-muted" style="margin-bottom: 390px; margin-top: 300px" >
+                        Ваша библиотека пуста.
+                        <a href="{% url 'book_catalog' page_number=1 %}" class="text-success">Давайте её заполним!</a>
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Подтвердите удаление</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Вы уверены, что хотите удалить эту книгу из библиотеки?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteButton">Удалить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+    let bookIdToDelete = null;
+
+    // Открыть модальное окно для подтверждения удаления
+    function confirmDelete(bookId) {
+        bookIdToDelete = bookId;
+        $('#deleteModal').modal('show'); // Показать модальное окно
+    }
+
+    // Функция удаления книги
+    document.getElementById('confirmDeleteButton').addEventListener('click', function () {
+        if (bookIdToDelete) {
+            fetch(`/library/delete/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ book_id: bookIdToDelete })
+            }).then(response => {
+                if (response.ok) {
+                    $('#deleteModal').modal('hide'); // Скрыть модальное окно
+                    location.reload();
+                } else {
+                    alert('Не удалось удалить книгу из библиотеки.');
+                }
+            });
+        }
+    });
+
+    // Функция для изменения статуса книги
+    function updateStatus(bookId, newStatus) {
+        fetch(`/library/update_status/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ book_id: bookId, status: newStatus })
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Не удалось изменить статус книги.');
+            }
+        });
+    }
+</script>
+
+    {% endblock %}
+</div>
+
+{% block footer %}
+    {% if user_books %}
+        <nav aria-label="Page navigation example">
+          <ul class="pagination d-flex justify-content-center">
+            <li class="page-item {% if not user_books.has_previous %} disabled {% endif %}">
+                <a class="page-link" href="{% if user_books.has_previous %} {%   url 'user_library' user_books.previous_page_number %} {% else %} # {% endif %}">Предыдущая</a></li>
+            {% for page in user_books.paginator.page_range %}
+                <li class="page-item">
+                    <a class="page-link" href="{% url 'user_library' page %}">{{ page }}</a></li>
+          {% endfor %}
+            <li class="page-item {% if not user_books.has_next %} disabled {% endif %}">
+                <a class="page-link" href="{% if user_books.has_next %} {%  url 'user_library' user_books.next_page_number %} {% else %} # {% endif %}">Следующая</a></li>
+          </ul>
+        </nav>
+    {% endif %}
+
+    <footer class="bg-white text-center py-4">
+        <p>© 2024 Рекомендательный сервис для книг</p>
+    </footer>
+{% endblock %}
+
+
