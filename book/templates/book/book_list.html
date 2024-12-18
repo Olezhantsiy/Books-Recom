@@ -166,19 +166,19 @@ function toggleBookmark(element) {
 
 {% block footer %}
 {% if books %}
-<nav aria-label="Page navigation example">
+<nav aria-label="Page navigation">
     <ul class="pagination d-flex justify-content-center">
 
         <li class="page-item {% if not books.has_previous %} disabled {% endif %}">
-            <a class="page-link" href="{% if books.has_previous %} {% url 'book_catalog' books.previous_page_number %} {% else %} # {% endif %}">Предыдущая</a>
+            <a class="page-link" href="{% if books.has_previous %} {% url 'book_catalog' books.previous_page_number %}?{{ request.GET.urlencode }} {% else %} # {% endif %}">Предыдущая</a>
         </li>
         {% for page in page_range %}
             <li class="page-item {% if page == books.number %} disabled {% endif %}">
-                <a class="page-link" href="{% url 'book_catalog' page %}">{{ page }}</a>
+                <a class="page-link" href="{% url 'book_catalog' page %}?{{ request.GET.urlencode }}">{{ page }}</a>
             </li>
         {% endfor %}
         <li class="page-item {% if not books.has_next %} disabled {% endif %}">
-            <a class="page-link" href="{% if books.has_next %} {% url 'book_catalog' books.next_page_number %} {% else %} # {% endif %}">Следующая</a>
+            <a class="page-link" href="{% if books.has_next %} {% url 'book_catalog' books.next_page_number %}?{{ request.GET.urlencode }} {% else %} # {% endif %}">Следующая</a>
         </li>
     </ul>
 </nav>

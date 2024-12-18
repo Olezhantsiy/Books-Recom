@@ -256,6 +256,18 @@ a:hover{
 
 @media screen and (max-width: 768px) {
 
+    .pagination {
+        font-size: 0.7rem;
+    }
+
+    .search-field{
+        width: fit-content !important;
+    }
+
+    .search-form{
+        gap: 0.5rem;
+    }
+
     .star_info{
         width: 0.8rem;
     }

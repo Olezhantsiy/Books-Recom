@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template.defaultfilters import title
 from numpy.ma.core import count
 from urllib.parse import unquote
-
+from django.core.cache import cache
 from .models import Book, UserLibrary, Rating, Author, Genre, Publisher
 from django.contrib.auth import authenticate, login, logout
 from .forms import LoginForm
@@ -25,10 +25,12 @@ def book_test(request):
     new_books = Book.objects.order_by('-publication_date')[:8]
     russian_classics = Book.objects.filter(genres__name='Русская классика')[:8]
 
-
-    user_id = request.user
-    if user_id.is_authenticated:
-        recommended_books = generate_collab_recommendations(user_id)
+    if request.user.is_authenticated:
+        cache_key = f'recommendations_{request.user.id}'
+        recommended_books = cache.get(cache_key)
+        if not recommended_books:
+            recommended_books = generate_collab_recommendations(request.user)
+            cache.set(cache_key, recommended_books, 60*60)
     else:
         recommended_books = []
 
@@ -73,7 +75,6 @@ def book_search_test(request, page_number=None, search_title=None):
         'publishers': Publisher.objects.all(),
     }
     return render(request, 'book/book_list.html', context)
-
 
 def book_list(request, page_number=None):
     if page_number is None:
@@ -179,7 +180,8 @@ def library_page(request, page_number=None):
     )
 
     context = {
-        'user_books': page_range,
+        'user_books': books_paginator,
+        'page_range': page_range,
     }
     return render(request, 'book/library.html', context)
 @csrf_exempt
